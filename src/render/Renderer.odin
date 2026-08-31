@@ -13,9 +13,10 @@ Engine :: struct {
 	using basicLight: BasicLight,
 }
 
-
 @(private)
 //! Don't want have direct access to the light shader for now
 BasicLight :: struct {
 	lightingShader: Raylib.Shader,
 }
+
+

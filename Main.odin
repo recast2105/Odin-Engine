@@ -1,10 +1,12 @@
 package Main
 
 import "core:fmt"
+// ---------- custom package ----------
+
+import CoreEntity "src/core"
 import Render "src/render"
 import Window "src/window"
 import Raylib "vendor:raylib"
-import "vendor:raylib/rlgl"
 
 // TODO: Find how to draw a cube and show in the screen
 
@@ -55,11 +57,11 @@ Start :: proc() {
 
 //! Temp to test draw cube
 Cube :: struct {
-	position: Raylib.Vector3,
-	color:    Raylib.Color,
-	width:    f32,
-	height:   f32,
-	length:   f32,
+	using entity: CoreEntity.Entity,
+	color:        Raylib.Color,
+	width:        f32,
+	height:       f32,
+	length:       f32,
 }
 
 @(private)
