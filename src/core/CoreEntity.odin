@@ -1,4 +1,4 @@
-package CoreEntity
+package Core
 
 Entity :: struct {
 	id:       int,

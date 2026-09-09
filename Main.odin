@@ -1,23 +1,23 @@
 package Main
 
 import "core:fmt"
-// ---------- custom package ----------
-
-import CoreEntity "src/core"
-import Render "src/render"
-import Window "src/window"
 import Raylib "vendor:raylib"
 
-// TODO: Find how to draw a cube and show in the screen
+// ---------- custom package ----------
+
+import Camera "src/core"
+import Engine "src/engine"
+import Mesh "src/mesh"
+import Window "src/window"
 
 @(private)
-_game := Render.Engine {
+_coreEngine := Engine.Engine {
 	Start  = Start,
 	Update = Update,
 }
 
 @(private)
-_engineWindow := Window.WindowConfiguration {
+_coreWindow := Window.WindowConfiguration {
 	width  = 800,
 	heigth = 600,
 	title  = "Odin Engine",
@@ -26,7 +26,8 @@ _engineWindow := Window.WindowConfiguration {
 @(private)
 _delta := Raylib.GetFrameTime()
 
-camera := Raylib.Camera3D {
+@(private)
+_coreCamera := Camera.Camera3D {
 	position   = {0.0, 10.0, 10.0},
 	target     = _myCube.position,
 	up         = {0.0, 1.0, 0.0},
@@ -35,37 +36,23 @@ camera := Raylib.Camera3D {
 }
 
 main :: proc() {
-	_game.Start()
-	_game.Update(_delta)
+	_coreEngine.Start()
+	_coreEngine.Update(_delta)
 }
 
 Start :: proc() {
-	Raylib.InitWindow(_engineWindow.width, _engineWindow.heigth, _engineWindow.title)
+	Raylib.InitWindow(_coreWindow.width, _coreWindow.heigth, _coreWindow.title)
 
-	_game.lightingShader = Raylib.LoadShader(
-		Render.LIGHTING_VERTEX_PATH,
-		Render.LIGHTING_FRAGMENT_PATH,
+	_coreEngine.lightingShader = Raylib.LoadShader(
+		Engine.LIGHTING_VERTEX_PATH,
+		Engine.LIGHTING_FRAGMENT_PATH,
 	)
 
-	if Raylib.IsShaderValid(_game.lightingShader) {
-		fmt.println("Shaders loaded with success")
-	}
-
-	Raylib.SetTargetFPS(Render.TARGET_FPS)
-
-}
-
-//! Temp to test draw cube
-Cube :: struct {
-	using entity: CoreEntity.Entity,
-	color:        Raylib.Color,
-	width:        f32,
-	height:       f32,
-	length:       f32,
+	Raylib.SetTargetFPS(Engine.TARGET_FPS)
 }
 
 @(private)
-_myCube := Cube {
+_myCube := Mesh.Cube {
 	position = {0, 0, 0},
 	color    = Raylib.RED,
 	width    = 2.0,
@@ -81,17 +68,17 @@ Update :: proc(delta: f32) {
 		Raylib.BeginDrawing()
 		Raylib.ClearBackground(Raylib.GRAY)
 
-		Raylib.BeginMode3D(camera)
+		Raylib.BeginMode3D(_coreCamera)
 
 		normalizedColor: Raylib.Vector4 = Raylib.ColorNormalize(_myCube.color)
-
 		Raylib.SetShaderValue(
-			_game.lightingShader,
-			Raylib.GetShaderLocation(_game.lightingShader, "objectColor"),
+			_coreEngine.lightingShader,
+			Raylib.GetShaderLocation(_coreEngine.lightingShader, "objectColor"),
 			&Raylib.Vector3{normalizedColor.x, normalizedColor.y, normalizedColor.z},
 			Raylib.ShaderUniformDataType.VEC3,
 		)
-		Raylib.BeginShaderMode(_game.lightingShader)
+
+		Raylib.BeginShaderMode(_coreEngine.lightingShader)
 
 		Raylib.DrawCube(
 			_myCube.position,
