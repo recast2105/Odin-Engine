@@ -5,7 +5,8 @@ import Raylib "vendor:raylib"
 
 // ---------- custom package ----------
 
-import Camera "src/core"
+
+import Core "src/core"
 import Engine "src/engine"
 import Mesh "src/mesh"
 import Window "src/window"
@@ -27,7 +28,7 @@ _coreWindow := Window.WindowConfiguration {
 _delta := Raylib.GetFrameTime()
 
 @(private)
-_coreCamera := Camera.Camera3D {
+_coreCamera := Core.Camera3D {
 	position   = {0.0, 10.0, 10.0},
 	target     = _myCube.position,
 	up         = {0.0, 1.0, 0.0},
@@ -43,6 +44,8 @@ main :: proc() {
 Start :: proc() {
 	Raylib.InitWindow(_coreWindow.width, _coreWindow.heigth, _coreWindow.title)
 
+	Engine.AppendArrayWorldObjects(_myCube.material)
+
 	_coreEngine.lightingShader = Raylib.LoadShader(
 		Engine.LIGHTING_VERTEX_PATH,
 		Engine.LIGHTING_FRAGMENT_PATH,
@@ -54,7 +57,7 @@ Start :: proc() {
 @(private)
 _myCube := Mesh.Cube {
 	position = {0, 0, 0},
-	color    = Raylib.RED,
+	material = {Raylib.RED},
 	width    = 2.0,
 	height   = 2.0,
 	length   = 2.0,
@@ -70,14 +73,16 @@ Update :: proc(delta: f32) {
 
 		Raylib.BeginMode3D(_coreCamera)
 
+		for worldObjects in Engine.ArrayWorldObjectsMaterial {
 
-		normalizedColor: Raylib.Vector4 = Raylib.ColorNormalize(_myCube.color)
-		Raylib.SetShaderValue(
-			_coreEngine.lightingShader,
-			Raylib.GetShaderLocation(_coreEngine.lightingShader, "objectColor"),
-			&Raylib.Vector3{normalizedColor.x, normalizedColor.y, normalizedColor.z},
-			.VEC3,
-		)
+			normalizedColor: Raylib.Vector4 = Raylib.ColorNormalize(worldObjects.color)
+			Raylib.SetShaderValue(
+				_coreEngine.lightingShader,
+				Raylib.GetShaderLocation(_coreEngine.lightingShader, "objectColor"),
+				&Raylib.Vector3{normalizedColor.x, normalizedColor.y, normalizedColor.z},
+				.VEC3,
+			)
+		}
 
 		Raylib.SetShaderValue(
 			_coreEngine.lightingShader,
@@ -93,7 +98,7 @@ Update :: proc(delta: f32) {
 			_myCube.width,
 			_myCube.height,
 			_myCube.length,
-			_myCube.color,
+			_myCube.material,
 		)
 
 		Raylib.EndShaderMode()

@@ -1,5 +1,6 @@
 package Engine
 
+import Core "../core"
 import Raylib "vendor:raylib"
 
 TARGET_FPS :: 60
@@ -18,4 +19,11 @@ Engine :: struct {
 //! Don't want have direct access to the light shader for now
 Shaders :: struct {
 	lightingShader: Raylib.Shader,
+}
+
+// To store all 3D Objects and apply the shaders
+ArrayWorldObjectsMaterial: [dynamic]Core.Material
+
+AppendArrayWorldObjects :: proc(entities: Core.Material) {
+	append(&ArrayWorldObjectsMaterial, entities)
 }

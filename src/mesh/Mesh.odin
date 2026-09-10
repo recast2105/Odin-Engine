@@ -1,11 +1,10 @@
 package Mesh
 
-import CoreEntity "../core"
-import Raylib "vendor:raylib"
+import Core "../core"
 
 Cube :: struct {
-	using entity: CoreEntity.Entity,
-	color:        Raylib.Color,
+	using entity: Core.Entity,
+	material:     Core.Material,
 	width:        f32,
 	height:       f32,
 	length:       f32,
