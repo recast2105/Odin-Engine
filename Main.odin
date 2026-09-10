@@ -70,12 +70,20 @@ Update :: proc(delta: f32) {
 
 		Raylib.BeginMode3D(_coreCamera)
 
+
 		normalizedColor: Raylib.Vector4 = Raylib.ColorNormalize(_myCube.color)
 		Raylib.SetShaderValue(
 			_coreEngine.lightingShader,
 			Raylib.GetShaderLocation(_coreEngine.lightingShader, "objectColor"),
 			&Raylib.Vector3{normalizedColor.x, normalizedColor.y, normalizedColor.z},
-			Raylib.ShaderUniformDataType.VEC3,
+			.VEC3,
+		)
+
+		Raylib.SetShaderValue(
+			_coreEngine.lightingShader,
+			Raylib.GetShaderLocation(_coreEngine.lightingShader, "cameraPosition"),
+			&_coreCamera.position,
+			.VEC3,
 		)
 
 		Raylib.BeginShaderMode(_coreEngine.lightingShader)
