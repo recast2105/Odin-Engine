@@ -1,9 +1,7 @@
 package Main
 
 import "core:fmt"
-
 import Raylib "vendor:raylib"
-
 
 // ---------- Custom Packages ----------
 
@@ -31,10 +29,10 @@ _coreCamera := Core.Camera {
 	id         = 1,
 	tag        = "Camera",
 	position   = {0.0, 10.0, 10.0},
-	target     = {0.0, 10.0, 9.0},
+	target     = _myCube.transform.position - 10,
 	up         = {0.0, 1.0, 0.0},
 	fovy       = 45.0,
-	projection = .PERSPECTIVE,
+	projection = .ORTHOGRAPHIC, // * Test, Change later
 }
 
 @(private)
