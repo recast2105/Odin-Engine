@@ -1,0 +1,12 @@
+"filename", "language", "GLSL", "odin", "Makefile", "comment", "blank", "total"
+"/home/loganbtgt/odin_projects/graphics_program/Main.odin", "odin", 0, 100, 0, 6, 41, 147
+"/home/loganbtgt/odin_projects/graphics_program/Makefile", "Makefile", 0, 0, 3, 0, 1, 4
+"/home/loganbtgt/odin_projects/graphics_program/shaders/LightingFragmengt.glsl", "GLSL", 24, 0, 0, 3, 10, 37
+"/home/loganbtgt/odin_projects/graphics_program/shaders/LightingVertex.glsl", "GLSL", 13, 0, 0, 0, 7, 20
+"/home/loganbtgt/odin_projects/graphics_program/src/core/Camera.odin", "odin", 0, 19, 0, 0, 14, 33
+"/home/loganbtgt/odin_projects/graphics_program/src/core/Entity.odin", "odin", 0, 6, 0, 0, 2, 8
+"/home/loganbtgt/odin_projects/graphics_program/src/editor/Hierarchy.odin", "odin", 0, 35, 0, 3, 16, 54
+"/home/loganbtgt/odin_projects/graphics_program/src/engine/Engine.odin", "odin", 0, 21, 0, 1, 14, 36
+"/home/loganbtgt/odin_projects/graphics_program/src/mesh/Mesh.odin", "odin", 0, 10, 0, 0, 4, 14
+"/home/loganbtgt/odin_projects/graphics_program/src/window/Window.odin", "odin", 0, 9, 0, 0, 3, 12
+"Total", "-", 37, 200, 3, 13, 112, 365

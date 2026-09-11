@@ -1,23 +1,23 @@
 package Main
 
 import "core:fmt"
+
 import Raylib "vendor:raylib"
 
-// ---------- custom package ----------
+
+// ---------- Custom Packages ----------
 
 import Core "src/core"
+import Editor "src/editor"
 import Engine "src/engine"
 import Mesh "src/mesh"
 import Window "src/window"
-
-DELTA := Raylib.GetFrameTime()
 
 @(private)
 _coreEngine := Engine.Engine {
 	Start  = Start,
 	Update = Update,
 }
-
 
 @(private)
 _coreWindow := Window.WindowConfiguration {
@@ -26,9 +26,10 @@ _coreWindow := Window.WindowConfiguration {
 	title  = "Odin Engine",
 }
 
-
 @(private)
-_coreCamera := Raylib.Camera3D {
+_coreCamera := Core.Camera {
+	id         = 1,
+	tag        = "Camera",
 	position   = {0.0, 10.0, 10.0},
 	target     = {0.0, 10.0, 9.0},
 	up         = {0.0, 1.0, 0.0},
@@ -43,16 +44,23 @@ _cameraController := Core.CameraController {
 	sensitivity = 0.01,
 }
 
-
 @(private)
-_myCube := Mesh.Cube {
-	position = {0, 0, 0},
-	material = {Raylib.RED},
-	width    = 2.0,
-	height   = .2,
-	length   = 2.0,
+_hierarchy := Editor.Hierarchy {
+	position = {0, 0},
+	size     = {250, 600},
 }
 
+// ! Test Cube
+@(private)
+_myCube := Mesh.Cube {
+	id = 0,
+	tag = "Cube",
+	transform = {position = {0, 0, 0}},
+	material = {color = Raylib.RED},
+	width = 2.0,
+	height = 0.2,
+	length = 2.0,
+}
 
 main :: proc() {
 
@@ -60,12 +68,15 @@ main :: proc() {
 	_coreEngine.Update()
 }
 
-
+// Initialization Scripts
 Start :: proc() {
 
 	Raylib.InitWindow(_coreWindow.width, _coreWindow.heigth, _coreWindow.title)
 
-	Engine.AppendArrayWorldObjects(_myCube.material)
+	// Register world entity
+	// ! * Test
+	Engine.AppendEntity(_coreCamera.entity)
+	Engine.AppendEntity(_myCube.entity)
 
 	Raylib.HideCursor()
 
@@ -77,6 +88,8 @@ Start :: proc() {
 	Raylib.SetTargetFPS(Engine.TARGET_FPS)
 }
 
+
+// Update the logic scripts
 Update :: proc() {
 
 	defer Raylib.CloseWindow()
@@ -85,24 +98,25 @@ Update :: proc() {
 
 		Core.UpdateCameraRotation(&_coreCamera, &_cameraController)
 
+		// ! Test Hierarchy
+		if (Raylib.IsKeyPressed(.A)) {
+			Engine.AppendEntity(_myCube)
+		}
+
 		Raylib.BeginDrawing()
 
 		Raylib.ClearBackground(Raylib.GRAY)
 
 		Raylib.BeginMode3D(_coreCamera)
 
-		for worldObjects in Engine.ArrayWorldObjectsMaterial {
+		normalizedColor := Raylib.ColorNormalize(_myCube.material.color)
 
-			normalizedColor: Raylib.Vector4 = Raylib.ColorNormalize(worldObjects.color)
-
-			Raylib.SetShaderValue(
-				_coreEngine.lightingShader,
-				Raylib.GetShaderLocation(_coreEngine.lightingShader, "objectColor"),
-				&Raylib.Vector3{normalizedColor.x, normalizedColor.y, normalizedColor.z},
-				.VEC3,
-			)
-		}
-
+		Raylib.SetShaderValue(
+			_coreEngine.lightingShader,
+			Raylib.GetShaderLocation(_coreEngine.lightingShader, "objectColor"),
+			&Raylib.Vector3{normalizedColor.x, normalizedColor.y, normalizedColor.z},
+			.VEC3,
+		)
 
 		Raylib.SetShaderValue(
 			_coreEngine.lightingShader,
@@ -111,26 +125,25 @@ Update :: proc() {
 			.VEC3,
 		)
 
-
 		Raylib.BeginShaderMode(_coreEngine.lightingShader)
 
-
 		Raylib.DrawCube(
-			_myCube.position,
+			_myCube.transform.position,
 			_myCube.width,
 			_myCube.height,
 			_myCube.length,
-			_myCube.material,
+			_myCube.material.color,
 		)
-
 
 		Raylib.EndShaderMode()
 
 		Raylib.EndMode3D()
 
+		// ---------- Editor UI ----------
 
-		Raylib.DrawText(fmt.ctprint("FPS:", Raylib.GetFPS()), 10, 10, 20, Raylib.GREEN)
+		Editor.DrawHierarchy(_hierarchy, Engine.Entities[:])
 
+		Raylib.DrawText(fmt.ctprint("FPS:", Raylib.GetFPS()), 260, 10, 20, Raylib.GREEN)
 
 		Raylib.EndDrawing()
 	}
