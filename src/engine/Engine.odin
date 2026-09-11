@@ -11,7 +11,7 @@ LIGHTING_FRAGMENT_PATH :: "shaders/LightingFragmengt.glsl"
 
 Engine :: struct {
 	Start:            proc(),
-	Update:           proc(_: f32),
+	Update:           proc(),
 	using basicLight: Shaders,
 }
 
@@ -21,9 +21,14 @@ Shaders :: struct {
 	lightingShader: Raylib.Shader,
 }
 
-// To store all 3D Objects and apply the shaders
-ArrayWorldObjectsMaterial: [dynamic]Core.Material
+// TODO: Create Shaders in Material struct and textures, but for the future
+Material :: struct {
+	using color: Raylib.Color,
+}
 
-AppendArrayWorldObjects :: proc(entities: Core.Material) {
+// To store all 3D Objects and apply the shaders
+ArrayWorldObjectsMaterial: [dynamic]Material
+
+AppendArrayWorldObjects :: proc(entities: Material) {
 	append(&ArrayWorldObjectsMaterial, entities)
 }

@@ -5,17 +5,19 @@ import Raylib "vendor:raylib"
 
 // ---------- custom package ----------
 
-
 import Core "src/core"
 import Engine "src/engine"
 import Mesh "src/mesh"
 import Window "src/window"
+
+DELTA := Raylib.GetFrameTime()
 
 @(private)
 _coreEngine := Engine.Engine {
 	Start  = Start,
 	Update = Update,
 }
+
 
 @(private)
 _coreWindow := Window.WindowConfiguration {
@@ -24,27 +26,48 @@ _coreWindow := Window.WindowConfiguration {
 	title  = "Odin Engine",
 }
 
-@(private)
-_delta := Raylib.GetFrameTime()
 
 @(private)
-_coreCamera := Core.Camera3D {
+_coreCamera := Raylib.Camera3D {
 	position   = {0.0, 10.0, 10.0},
-	target     = _myCube.position,
+	target     = {0.0, 10.0, 9.0},
 	up         = {0.0, 1.0, 0.0},
 	fovy       = 45.0,
 	projection = .PERSPECTIVE,
 }
 
-main :: proc() {
-	_coreEngine.Start()
-	_coreEngine.Update(_delta)
+@(private)
+_cameraController := Core.CameraController {
+	yaw         = -1.57,
+	pitch       = 0.0,
+	sensitivity = 0.01,
 }
 
+
+@(private)
+_myCube := Mesh.Cube {
+	position = {0, 0, 0},
+	material = {Raylib.RED},
+	width    = 2.0,
+	height   = .2,
+	length   = 2.0,
+}
+
+
+main :: proc() {
+
+	_coreEngine.Start()
+	_coreEngine.Update()
+}
+
+
 Start :: proc() {
+
 	Raylib.InitWindow(_coreWindow.width, _coreWindow.heigth, _coreWindow.title)
 
 	Engine.AppendArrayWorldObjects(_myCube.material)
+
+	Raylib.HideCursor()
 
 	_coreEngine.lightingShader = Raylib.LoadShader(
 		Engine.LIGHTING_VERTEX_PATH,
@@ -54,21 +77,16 @@ Start :: proc() {
 	Raylib.SetTargetFPS(Engine.TARGET_FPS)
 }
 
-@(private)
-_myCube := Mesh.Cube {
-	position = {0, 0, 0},
-	material = {Raylib.RED},
-	width    = 2.0,
-	height   = 2.0,
-	length   = 2.0,
-}
-
-Update :: proc(delta: f32) {
+Update :: proc() {
 
 	defer Raylib.CloseWindow()
+
 	for !Raylib.WindowShouldClose() {
 
+		Core.UpdateCameraRotation(&_coreCamera, &_cameraController)
+
 		Raylib.BeginDrawing()
+
 		Raylib.ClearBackground(Raylib.GRAY)
 
 		Raylib.BeginMode3D(_coreCamera)
@@ -76,6 +94,7 @@ Update :: proc(delta: f32) {
 		for worldObjects in Engine.ArrayWorldObjectsMaterial {
 
 			normalizedColor: Raylib.Vector4 = Raylib.ColorNormalize(worldObjects.color)
+
 			Raylib.SetShaderValue(
 				_coreEngine.lightingShader,
 				Raylib.GetShaderLocation(_coreEngine.lightingShader, "objectColor"),
@@ -84,6 +103,7 @@ Update :: proc(delta: f32) {
 			)
 		}
 
+
 		Raylib.SetShaderValue(
 			_coreEngine.lightingShader,
 			Raylib.GetShaderLocation(_coreEngine.lightingShader, "cameraPosition"),
@@ -91,7 +111,9 @@ Update :: proc(delta: f32) {
 			.VEC3,
 		)
 
+
 		Raylib.BeginShaderMode(_coreEngine.lightingShader)
+
 
 		Raylib.DrawCube(
 			_myCube.position,
@@ -101,11 +123,15 @@ Update :: proc(delta: f32) {
 			_myCube.material,
 		)
 
+
 		Raylib.EndShaderMode()
 
 		Raylib.EndMode3D()
 
+
 		Raylib.DrawText(fmt.ctprint("FPS:", Raylib.GetFPS()), 10, 10, 20, Raylib.GREEN)
+
+
 		Raylib.EndDrawing()
 	}
 }
