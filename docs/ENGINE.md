@@ -21,16 +21,16 @@ usa o loop padrão ou controla os próprios frames.
 O menor programa possível inicializa, executa e encerra a engine:
 
 ```odin
-engine: Engine.Engine
-Engine.Initialize(&engine, Engine.EngineConfig {
+engine: OdinEngine.Engine
+OdinEngine.Initialize(&engine, OdinEngine.EngineConfig {
 	Window = {Width = 800, Height = 600, Title = "Meu projeto"},
 	TargetFps = 60,
 	ClearColor = Raylib.GRAY,
 	Editor = {ShowHierarchy = true, HierarchyWidth = 250},
 })
-defer Engine.Shutdown(&engine)
+defer OdinEngine.Shutdown(&engine)
 
-Engine.Run(&engine)
+OdinEngine.Run(&engine)
 ```
 
 `Run` não recebe callbacks de jogo. Ele apenas abre os frames e, se ativado,
@@ -71,37 +71,37 @@ conhece a engine; a engine continua sem conhecer a aplicação.
 package App
 
 import Raylib "vendor:raylib"
-import Engine "src/engine"
+import OdinEngine "src/engine"
 
 Application :: struct {
-    engine: Engine.Engine,
+    engine: OdinEngine.Engine,
 }
 
 Run :: proc() {
     app: Application
-    Engine.Initialize(&app.engine, Engine.EngineConfig {
+    OdinEngine.Initialize(&app.engine, OdinEngine.EngineConfig {
         Window = {Width = 1280, Height = 720, Title = "Meu projeto"},
         TargetFps = 60,
         ClearColor = Raylib.Color {13, 16, 22, 255},
         Editor = {ShowHierarchy = true, HierarchyWidth = 280},
     })
-    defer Engine.Shutdown(&app.engine)
+    defer OdinEngine.Shutdown(&app.engine)
 
     CreateScene(&app)
 
-    for !Engine.ShouldClose(&app.engine) {
+    for !OdinEngine.ShouldClose(&app.engine) {
         Update(&app)
 
-        Engine.BeginFrame(&app.engine)
-        Engine.DrawEditor(app.engine.Config.Editor, &app.engine.Scene)
+        OdinEngine.BeginFrame(&app.engine)
+        OdinEngine.DrawEditor(app.engine.Config.Editor, &app.engine.Scene)
         Render(&app) // adicione a renderização do projeto aqui quando existir
-        Engine.EndFrame()
+        OdinEngine.EndFrame()
     }
 }
 
 CreateScene :: proc(app: ^Application) {
-    Engine.CreateEntity(&app.engine.Scene, "Player")
-    Engine.CreateEntity(&app.engine.Scene, "Main Camera")
+    OdinEngine.CreateEntity(&app.engine.Scene, "Player")
+    OdinEngine.CreateEntity(&app.engine.Scene, "Main Camera")
 }
 
 Update :: proc(app: ^Application) {
@@ -142,17 +142,17 @@ Quando houver lógica de jogo, o projeto pode substituir o loop padrão sem a
 engine precisar conhecer essa lógica:
 
 ```odin
-for !Engine.ShouldClose(&engine) {
+for !OdinEngine.ShouldClose(&engine) {
     // update do projeto
 
-    Engine.BeginFrame(&engine)
-    Engine.DrawEditor(engine.Config.Editor, &engine.Scene)
+    OdinEngine.BeginFrame(&engine)
+    OdinEngine.DrawEditor(engine.Config.Editor, &engine.Scene)
     // render do projeto
-    Engine.EndFrame()
+    OdinEngine.EndFrame()
 }
 ```
 
-Chame `Engine.Shutdown` ao final para liberar a cena e fechar a janela.
+Chame `OdinEngine.Shutdown` ao final para liberar a cena e fechar a janela.
 
 ## Estado atual
 

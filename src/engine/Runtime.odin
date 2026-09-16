@@ -53,7 +53,7 @@ ShouldClose :: proc(engine: ^Engine) -> bool {
 DeltaTime :: proc() -> f32 {return Raylib.GetFrameTime()}
 
 /// Inicia um frame e limpa a tela com EngineConfig.ClearColor.
-/// Todo BeginFrame deve ser finalizado com EndFrame.
+// *  TODO: BeginFrame deve ser finalizado com EndFrame.
 BeginFrame :: proc(engine: ^Engine) {
 	Raylib.BeginDrawing()
 	Raylib.ClearBackground(engine.Config.ClearColor)
