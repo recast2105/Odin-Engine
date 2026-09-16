@@ -37,6 +37,87 @@ Engine.Run(&engine)
 desenha a Hierarchy. Por isso o `Main.odin` atual pode permanecer somente como
 o inicializador do framework.
 
+## Estrutura recomendada para um projeto
+
+Não concentre a lógica em `Main.odin`. Use-o apenas como ponto de entrada e
+crie um pacote da aplicação para guardar o estado, a criação da cena e os
+sistemas do projeto:
+
+```text
+Main.odin           ponto de entrada
+src/app/App.odin    ciclo de vida e estado da aplicação
+src/app/Game.odin   regras, sistemas e objetos do projeto
+src/engine/         framework reutilizável
+```
+
+### Main mínimo
+
+```odin
+package Main
+
+import App "src/app"
+
+main :: proc() {
+    App.Run()
+}
+```
+
+### Aplicação dona da lógica
+
+O código abaixo é um ponto de partida para `src/app/App.odin`. A aplicação
+conhece a engine; a engine continua sem conhecer a aplicação.
+
+```odin
+package App
+
+import Raylib "vendor:raylib"
+import Engine "src/engine"
+
+Application :: struct {
+    engine: Engine.Engine,
+}
+
+Run :: proc() {
+    app: Application
+    Engine.Initialize(&app.engine, Engine.EngineConfig {
+        Window = {Width = 1280, Height = 720, Title = "Meu projeto"},
+        TargetFps = 60,
+        ClearColor = Raylib.Color {13, 16, 22, 255},
+        Editor = {ShowHierarchy = true, HierarchyWidth = 280},
+    })
+    defer Engine.Shutdown(&app.engine)
+
+    CreateScene(&app)
+
+    for !Engine.ShouldClose(&app.engine) {
+        Update(&app)
+
+        Engine.BeginFrame(&app.engine)
+        Engine.DrawEditor(app.engine.Config.Editor, &app.engine.Scene)
+        Render(&app) // adicione a renderização do projeto aqui quando existir
+        Engine.EndFrame()
+    }
+}
+
+CreateScene :: proc(app: ^Application) {
+    Engine.CreateEntity(&app.engine.Scene, "Player")
+    Engine.CreateEntity(&app.engine.Scene, "Main Camera")
+}
+
+Update :: proc(app: ^Application) {
+    // Atualização de input, regras e sistemas do projeto.
+}
+
+Render :: proc(app: ^Application) {
+    // Renderização específica do projeto.
+}
+```
+
+Use arquivos adicionais dentro de `src/app` quando o projeto crescer. Por
+exemplo, `Player.odin`, `World.odin` ou `Game.odin` podem conter as regras
+específicas, recebendo apenas o estado que precisam em vez de colocar tudo em
+`App.odin`.
+
 ## Cena e Hierarchy
 
 Crie entidades usando a cena da instância:

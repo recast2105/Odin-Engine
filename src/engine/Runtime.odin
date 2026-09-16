@@ -15,22 +15,22 @@ WindowConfig :: struct {
 /// Agrupa toda a configuração necessária para inicializar uma Engine.
 EngineConfig :: struct {
 	/// Propriedades da janela de execução.
-	Window:      WindowConfig,
+	Window:     WindowConfig,
 	/// Limite desejado de quadros por segundo.
-	TargetFps:   i32,
+	TargetFps:  i32,
 	/// Cor usada para limpar a tela no início de cada frame.
-	ClearColor:  Raylib.Color,
+	ClearColor: Raylib.Color,
 	/// Configuração das ferramentas visuais básicas da engine.
-	Editor:      EditorConfig,
+	Editor:     EditorConfig,
 }
 
 /// Mantém o estado reutilizável do runtime, da cena e do editor.
 /// A Engine nunca importa ou depende de código da aplicação.
 Engine :: struct {
 	/// Configuração aplicada durante a inicialização.
-	Config:     EngineConfig,
+	Config:    EngineConfig,
 	/// Cena ativa, onde as entidades são registradas.
-	Scene:      Scene,
+	Scene:     Scene,
 	/// Indica se a janela e os recursos da engine ainda estão ativos.
 	IsRunning: bool,
 }
@@ -50,7 +50,7 @@ ShouldClose :: proc(engine: ^Engine) -> bool {
 }
 
 /// Retorna a duração, em segundos, do último frame renderizado.
-DeltaTime :: proc() -> f32 { return Raylib.GetFrameTime() }
+DeltaTime :: proc() -> f32 {return Raylib.GetFrameTime()}
 
 /// Inicia um frame e limpa a tela com EngineConfig.ClearColor.
 /// Todo BeginFrame deve ser finalizado com EndFrame.
@@ -60,7 +60,7 @@ BeginFrame :: proc(engine: ^Engine) {
 }
 
 /// Finaliza o frame aberto por BeginFrame e o apresenta na janela.
-EndFrame :: proc() { Raylib.EndDrawing() }
+EndFrame :: proc() {Raylib.EndDrawing()}
 
 /// Executa o loop padrão sem callbacks de projeto.
 /// O loop desenha somente o editor básico configurado e termina ao fechar a janela.
@@ -76,7 +76,7 @@ Run :: proc(engine: ^Engine) {
 /// Libera a cena, encerra a instância e fecha a janela.
 /// É seguro chamar mais de uma vez; chamadas posteriores não fazem nada.
 Shutdown :: proc(engine: ^Engine) {
-	if !engine.IsRunning { return }
+	if !engine.IsRunning {return}
 	ClearScene(&engine.Scene)
 	engine.IsRunning = false
 	Raylib.CloseWindow()
