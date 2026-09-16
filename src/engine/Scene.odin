@@ -1,31 +1,45 @@
 package Engine
 
+/// Representa um objeto registrado em uma Scene.
 Entity :: struct {
+	/// Identificador da entidade dentro da cena.
 	ID:        int,
+	/// Nome exibido pela Hierarchy e usado para identificação humana.
 	Name:      string,
+	/// Transformação espacial básica da entidade.
 	Transform: Transform,
 }
 
-Transform :: struct { Position: [3]f32 }
-
-Scene :: struct {
-	entities:       [dynamic]Entity,
-	next_entity_id: int,
+/// Contém os dados espaciais básicos de uma Entity.
+Transform :: struct {
+	/// Posição XYZ da entidade no mundo.
+	Position: [3]f32,
 }
 
-Scene_Register :: proc(scene: ^Scene, entity: Entity) { append(&scene.entities, entity) }
+/// Armazena as entidades de uma cena e controla a geração de IDs.
+Scene :: struct {
+	entities:       [dynamic]Entity,
+	nextEntityId: int,
+}
 
-// Every entity created by the scene is automatically visible to the hierarchy.
-Scene_Create_Entity :: proc(scene: ^Scene, name: string) -> Entity {
-	entity := Entity {ID = scene.next_entity_id, Name = name}
-	scene.next_entity_id += 1
-	Scene_Register(scene, entity)
+/// Registra uma Entity já construída na Scene.
+/// Esta operação não verifica IDs duplicados; use CreateEntity quando possível.
+RegisterEntity :: proc(scene: ^Scene, entity: Entity) { append(&scene.entities, entity) }
+
+/// Cria, registra e retorna uma Entity com ID gerado automaticamente.
+/// A entidade passa a aparecer na Hierarchy quando ela estiver habilitada.
+CreateEntity :: proc(scene: ^Scene, name: string) -> Entity {
+	entity := Entity {ID = scene.nextEntityId, Name = name}
+	scene.nextEntityId += 1
+	RegisterEntity(scene, entity)
 	return entity
 }
 
-Scene_Entities :: proc(scene: ^Scene) -> []Entity { return scene.entities[:] }
+/// Retorna uma visão das entidades registradas, útil para interfaces customizadas.
+GetEntities :: proc(scene: ^Scene) -> []Entity { return scene.entities[:] }
 
-Scene_Clear :: proc(scene: ^Scene) {
+/// Remove todas as entidades da Scene e reinicia a sequência de IDs.
+ClearScene :: proc(scene: ^Scene) {
 	delete(scene.entities)
-	scene.next_entity_id = 0
+	scene.nextEntityId = 0
 }

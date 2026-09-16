@@ -2,59 +2,82 @@ package Engine
 
 import Raylib "vendor:raylib"
 
-Window_Config :: struct {
+/// Define as propriedades da janela criada pela engine.
+WindowConfig :: struct {
+	/// Largura inicial da janela, em pixels.
 	Width:  i32,
+	/// Altura inicial da janela, em pixels.
 	Height: i32,
+	/// Título exibido pela janela.
 	Title:  cstring,
 }
 
-Config :: struct {
-	Window:      Window_Config,
-	Target_FPS:  i32,
-	Clear_Color: Raylib.Color,
-	Editor:      Editor_Config,
+/// Agrupa toda a configuração necessária para inicializar uma Engine.
+EngineConfig :: struct {
+	/// Propriedades da janela de execução.
+	Window:      WindowConfig,
+	/// Limite desejado de quadros por segundo.
+	TargetFps:   i32,
+	/// Cor usada para limpar a tela no início de cada frame.
+	ClearColor:  Raylib.Color,
+	/// Configuração das ferramentas visuais básicas da engine.
+	Editor:      EditorConfig,
 }
 
-// Engine owns only reusable runtime state. It never imports application code.
+/// Mantém o estado reutilizável do runtime, da cena e do editor.
+/// A Engine nunca importa ou depende de código da aplicação.
 Engine :: struct {
-	Config:     Config,
+	/// Configuração aplicada durante a inicialização.
+	Config:     EngineConfig,
+	/// Cena ativa, onde as entidades são registradas.
 	Scene:      Scene,
-	Is_Running: bool,
+	/// Indica se a janela e os recursos da engine ainda estão ativos.
+	IsRunning: bool,
 }
 
-Initialize :: proc(engine: ^Engine, config: Config) {
+/// Cria a janela e prepara a instância para executar frames.
+/// Deve ser chamado uma vez antes de qualquer outra operação da engine.
+Initialize :: proc(engine: ^Engine, config: EngineConfig) {
 	engine.Config = config
 	Raylib.InitWindow(config.Window.Width, config.Window.Height, config.Window.Title)
-	Raylib.SetTargetFPS(config.Target_FPS)
-	engine.Is_Running = true
+	Raylib.SetTargetFPS(config.TargetFps)
+	engine.IsRunning = true
 }
 
-Should_Close :: proc(engine: ^Engine) -> bool {
-	return !engine.Is_Running || Raylib.WindowShouldClose()
+/// Retorna true quando a janela foi fechada ou a engine foi encerrada.
+ShouldClose :: proc(engine: ^Engine) -> bool {
+	return !engine.IsRunning || Raylib.WindowShouldClose()
 }
 
-Delta_Time :: proc() -> f32 { return Raylib.GetFrameTime() }
+/// Retorna a duração, em segundos, do último frame renderizado.
+DeltaTime :: proc() -> f32 { return Raylib.GetFrameTime() }
 
-Begin_Frame :: proc(engine: ^Engine) {
+/// Inicia um frame e limpa a tela com EngineConfig.ClearColor.
+/// Todo BeginFrame deve ser finalizado com EndFrame.
+BeginFrame :: proc(engine: ^Engine) {
 	Raylib.BeginDrawing()
-	Raylib.ClearBackground(engine.Config.Clear_Color)
+	Raylib.ClearBackground(engine.Config.ClearColor)
 }
 
-End_Frame :: proc() { Raylib.EndDrawing() }
+/// Finaliza o frame aberto por BeginFrame e o apresenta na janela.
+EndFrame :: proc() { Raylib.EndDrawing() }
 
-// Run is intentionally callback-free. Projects can use it while they need
-// only the engine shell; later they can own their own loop using Begin_Frame.
+/// Executa o loop padrão sem callbacks de projeto.
+/// O loop desenha somente o editor básico configurado e termina ao fechar a janela.
+/// Projetos com lógica própria podem usar BeginFrame e EndFrame diretamente.
 Run :: proc(engine: ^Engine) {
-	for !Should_Close(engine) {
-		Begin_Frame(engine)
-		Editor_Draw(engine.Config.Editor, &engine.Scene)
-		End_Frame()
+	for !ShouldClose(engine) {
+		BeginFrame(engine)
+		DrawEditor(engine.Config.Editor, &engine.Scene)
+		EndFrame()
 	}
 }
 
+/// Libera a cena, encerra a instância e fecha a janela.
+/// É seguro chamar mais de uma vez; chamadas posteriores não fazem nada.
 Shutdown :: proc(engine: ^Engine) {
-	if !engine.Is_Running { return }
-	Scene_Clear(&engine.Scene)
-	engine.Is_Running = false
+	if !engine.IsRunning { return }
+	ClearScene(&engine.Scene)
+	engine.IsRunning = false
 	Raylib.CloseWindow()
 }

@@ -22,11 +22,11 @@ O menor programa possível inicializa, executa e encerra a engine:
 
 ```odin
 engine: Engine.Engine
-Engine.Initialize(&engine, Engine.Config {
-    Window = {Width = 800, Height = 600, Title = "Meu projeto"},
-    Target_FPS = 60,
-    Clear_Color = Raylib.GRAY,
-    Editor = {Show_Hierarchy = true, Hierarchy_Width = 250},
+Engine.Initialize(&engine, Engine.EngineConfig {
+	Window = {Width = 800, Height = 600, Title = "Meu projeto"},
+	TargetFps = 60,
+	ClearColor = Raylib.GRAY,
+	Editor = {ShowHierarchy = true, HierarchyWidth = 250},
 })
 defer Engine.Shutdown(&engine)
 
@@ -42,17 +42,17 @@ o inicializador do framework.
 Crie entidades usando a cena da instância:
 
 ```odin
-player := Engine.Scene_Create_Entity(&engine.Scene, "Player")
-camera := Engine.Scene_Create_Entity(&engine.Scene, "Main Camera")
+player := Engine.CreateEntity(&engine.Scene, "Player")
+camera := Engine.CreateEntity(&engine.Scene, "Main Camera")
 ```
 
 Cada chamada gera um identificador sequencial, registra a entidade e a torna
 visível na Hierarchy automaticamente. A entidade possui `ID`, `Name` e
 `Transform`; atualmente o transform contém somente `Position`.
 
-`Scene_Register` também aceita uma `Entity` pronta. Ele é uma operação de
-baixo nível e não valida IDs repetidos; prefira `Scene_Create_Entity` para os
-objetos normais do projeto. `Scene_Entities` expõe uma visão da lista para
+`RegisterEntity` também aceita uma `Entity` pronta. Ele é uma operação de
+baixo nível e não valida IDs repetidos; prefira `CreateEntity` para os
+objetos normais do projeto. `GetEntities` expõe uma visão da lista para
 interfaces como uma Hierarchy customizada.
 
 ## Loop próprio do projeto
@@ -61,13 +61,13 @@ Quando houver lógica de jogo, o projeto pode substituir o loop padrão sem a
 engine precisar conhecer essa lógica:
 
 ```odin
-for !Engine.Should_Close(&engine) {
+for !Engine.ShouldClose(&engine) {
     // update do projeto
 
-    Engine.Begin_Frame(&engine)
-    Engine.Editor_Draw(engine.Config.Editor, &engine.Scene)
+    Engine.BeginFrame(&engine)
+    Engine.DrawEditor(engine.Config.Editor, &engine.Scene)
     // render do projeto
-    Engine.End_Frame()
+    Engine.EndFrame()
 }
 ```
 

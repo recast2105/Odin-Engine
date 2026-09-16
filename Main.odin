@@ -1,18 +1,21 @@
 // The executable only starts the reusable engine shell.
 package Main
 
-import Raylib "vendor:raylib"
 import Engine "src/engine"
+import Raylib "vendor:raylib"
 
 main :: proc() {
 	engine: Engine.Engine
 
-	Engine.Initialize(&engine, Engine.Config {
-		Window = {Width = 800, Height = 600, Title = "Odin Engine"},
-		Target_FPS = 60,
-		Clear_Color = Raylib.GRAY,
-		Editor = {Show_Hierarchy = true, Hierarchy_Width = 250},
-	})
+	Engine.Initialize(
+		&engine,
+		Engine.EngineConfig {
+			Window = {Width = 800, Height = 600, Title = "Odin Engine"},
+			TargetFps = 60,
+			ClearColor = Raylib.Color{13, 16, 22, 255},
+			Editor = {ShowHierarchy = true, HierarchyWidth = 280},
+		},
+	)
 	defer Engine.Shutdown(&engine)
 
 	Engine.Run(&engine)
