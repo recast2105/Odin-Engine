@@ -52,7 +52,7 @@ ShouldClose :: proc(engine: ^Engine) -> bool {
 /// Retorna a duração, em segundos, do último frame renderizado.
 DeltaTime :: proc() -> f32 {return Raylib.GetFrameTime()}
 
-/// Inicia um frame e limpa a tela com EngineConfig.ClearColor.
+// ## Inicia um frame e limpa a tela com EngineConfig.ClearColor.
 // *  TODO: BeginFrame deve ser finalizado com EndFrame.
 BeginFrame :: proc(engine: ^Engine) {
 	Raylib.BeginDrawing()
@@ -73,8 +73,8 @@ Run :: proc(engine: ^Engine) {
 	}
 }
 
-/// Libera a cena, encerra a instância e fecha a janela.
-/// É seguro chamar mais de uma vez; chamadas posteriores não fazem nada.
+// ## Libera a cena, encerra a instância e fecha a janela.
+// * É seguro chamar mais de uma vez; chamadas posteriores não fazem nada.
 Shutdown :: proc(engine: ^Engine) {
 	if !engine.IsRunning {return}
 	ClearScene(&engine.Scene)

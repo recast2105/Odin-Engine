@@ -31,5 +31,14 @@ UpdateFreeCamera :: proc(camera: ^Camera, controller: ^CameraController) {
 		Math.sin(controller.Pitch),
 		Math.sin(controller.Yaw) * Math.cos(controller.Pitch),
 	}
+	
 	camera.Data.target = camera.Data.position + direction
+}
+
+BeginMode3D :: proc(camera: Camera) {
+	Raylib.BeginMode3D(camera.Data)
+}
+
+EndMode3D :: proc() {
+	Raylib.EndMode3D()
 }

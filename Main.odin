@@ -7,6 +7,16 @@ import Raylib "vendor:raylib"
 main :: proc() {
 	engine: OdinEngine.Engine
 
+	camera: OdinEngine.Camera = {
+		Data = {
+			position = {10, 10, 10},
+			fovy = 45,
+			projection = .ORTHOGRAPHIC,
+			up = OdinEngine.Vector3Up(),
+			target = {0, 0, 0},
+		},
+	}
+
 	OdinEngine.Initialize(
 		&engine,
 		OdinEngine.EngineConfig {
@@ -16,7 +26,20 @@ main :: proc() {
 			Editor = {ShowHierarchy = true, HierarchyWidth = 280},
 		},
 	)
+
 	defer OdinEngine.Shutdown(&engine)
 
-	OdinEngine.Run(&engine)
+	for !OdinEngine.ShouldClose(&engine) {
+
+		OdinEngine.BeginFrame(&engine)
+		OdinEngine.DrawEditor(engine.Config.Editor, &engine.Scene)
+
+		OdinEngine.BeginMode3D(camera)
+
+		Raylib.DrawGrid(20, 1)
+
+		OdinEngine.EndMode3D()
+
+		OdinEngine.EndFrame()
+	}
 }

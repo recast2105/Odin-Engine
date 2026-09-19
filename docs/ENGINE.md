@@ -123,8 +123,8 @@ específicas, recebendo apenas o estado que precisam em vez de colocar tudo em
 Crie entidades usando a cena da instância:
 
 ```odin
-player := Engine.CreateEntity(&engine.Scene, "Player")
-camera := Engine.CreateEntity(&engine.Scene, "Main Camera")
+player := OdinEngine.CreateEntity(&engine.Scene, "Player")
+camera := OdinEngine.CreateEntity(&engine.Scene, "Main Camera")
 ```
 
 Cada chamada gera um identificador sequencial, registra a entidade e a torna

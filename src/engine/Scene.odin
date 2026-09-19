@@ -18,25 +18,32 @@ Transform :: struct {
 
 /// Armazena as entidades de uma cena e controla a geração de IDs.
 Scene :: struct {
-	entities:       [dynamic]Entity,
+	entities:     [dynamic]Entity,
 	nextEntityId: int,
 }
 
-/// Registra uma Entity já construída na Scene.
-/// Esta operação não verifica IDs duplicados; use CreateEntity quando possível.
-RegisterEntity :: proc(scene: ^Scene, entity: Entity) { append(&scene.entities, entity) }
+// ! Não usar essa função em logica de projeto
+// ## Registra uma Entity já construída na Scene.
+// * Esta operação não verifica IDs duplicados; use CreateEntity quando possível.
+@(private)
+RegisterEntity :: proc(scene: ^Scene, entity: Entity) {append(&scene.entities, entity)}
 
-/// Cria, registra e retorna uma Entity com ID gerado automaticamente.
-/// A entidade passa a aparecer na Hierarchy quando ela estiver habilitada.
+// ## Cria, registra e retorna uma Entity com ID gerado automaticamente.
+// * A entidade passa a aparecer na Hierarchy quando ela estiver habilitada.
+// * **scene** -> registra dentro da scene da engine
+// * **name** -> Usa o parametro *Name* dentro do struct *Entity*
 CreateEntity :: proc(scene: ^Scene, name: string) -> Entity {
-	entity := Entity {ID = scene.nextEntityId, Name = name}
+	entity := Entity {
+		ID   = scene.nextEntityId,
+		Name = name,
+	}
 	scene.nextEntityId += 1
 	RegisterEntity(scene, entity)
 	return entity
 }
 
-/// Retorna uma visão das entidades registradas, útil para interfaces customizadas.
-GetEntities :: proc(scene: ^Scene) -> []Entity { return scene.entities[:] }
+// Retorna uma visão das entidades registradas, útil para interfaces customizadas.
+GetEntities :: proc(scene: ^Scene) -> []Entity {return scene.entities[:]}
 
 /// Remove todas as entidades da Scene e reinicia a sequência de IDs.
 ClearScene :: proc(scene: ^Scene) {
